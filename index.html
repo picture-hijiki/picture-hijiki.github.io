@@ -1,23 +1,74 @@
-<!DOCTYPE html><html lang="ja"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <title>Picture Viewer</title> <link rel="stylesheet" href="style.css"/> </head> <body> <div id="loader"> <div class="spinner"></div> <p>Loading...</p> </div> <div id="auth-screen"> <h1>🔒 Access Code Required</h1> <form id="access-form"> <input type="password" id="access-input" placeholder="Enter access code" required /> <button type="submit" id="access-btn">Enter</button> </form> <p id="error-message"></p> </div> <div id="modal" class="hidden"> <div id="modal-bg"></div> <img id="modal-img" src="" alt="expanded view" /> <button id="modal-close">×</button>
-  text
-  <!-- 左右ナビゲーション -->
-  <button id="modal-prev" class="nav-btn" aria-label="Previous photo">‹</button>
-  <button id="modal-next" class="nav-btn" aria-label="Next photo">›</button>
-  </div> <div id="viewer" class="hidden"> <header> <h1>📸 Picture Viewer</h1> <div class="controls"> <select id="day-select"> <option value="">Select Day</option> <option value="All">All Days</option> <option value="Day1">Day 1</option> <option value="Day2">Day 2</option> <option value="Day3">Day 3</option> <option value="Day4">Day 4</option> <option value="Day5">Day 5</option> <option value="Day6">Day 6</option> <option value="Day7">Day 7</option> </select>
-  text
-      <select id="sort-select">
-        <option value="">Sort by</option>
-        <option value="1">Refrigerator</option>
-        <option value="2">Ziplock Bag</option>
-        <option value="3">Plastic Wrap</option>
-        <option value="4">Room Temperature</option>
-      </select>
-    </div>
-    <h3 id="sort-display"></h3>
-  </header>
-  
-  <main id="gallery"></main>
-  <footer>
-    <p>© 2025 Hisaki & Sangyun</p>
-  </footer>
-  </div> <div id="error-screen" class="hidden"> <h1>🚫 Access Denied</h1> <p>Invalid access code.</p> </div> <script src="script.js"></script></body> </html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Picture Viewer</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div id="auth-screen">
+    <h1>🔒 Access Code Required</h1>
+    <form id="access-form">
+      <input type="password" id="access-input" placeholder="Enter access code" required />
+      <button type="submit" id="access-btn">Enter</button>
+    </form>
+    <p id="error-message"></p>
+  </div>
+
+  <div id="modal" class="hidden" aria-hidden="true">
+    <div id="modal-bg"></div>
+    <img id="modal-img" src="" alt="expanded view" />
+    <button id="modal-close" aria-label="Close">×</button>
+
+    <!-- 追加: 前へ / 次へ ボタン -->
+    <button id="modal-prev" class="modal-nav" aria-label="Previous">‹</button>
+    <button id="modal-next" class="modal-nav" aria-label="Next">›</button>
+  </div>
+
+  <div id="viewer" class="hidden">
+    <header>
+      <h1>📸 Picture Viewer</h1>
+      <div class="controls">
+        <select id="day-select">
+          <option value="">Select Day</option>
+          <option value="All">All Days</option>
+          <option value="Day1">Day 1</option>
+          <option value="Day2">Day 2</option>
+          <option value="Day3">Day 3</option>
+          <option value="Day4">Day 4</option>
+          <option value="Day5">Day 5</option>
+          <option value="Day6">Day 6</option>
+          <option value="Day7">Day 7</option>
+        </select>
+
+        <select id="sort-select">
+          <option value="">Sort by</option>
+          <option value="1">Refrigerator</option>
+          <option value="2">Ziplock Bag</option>
+          <option value="3">Plastic Wrap</option>
+          <option value="4">Room Temperature</option>
+        </select>
+      </div>
+      <h3 id="sort-display"></h3>
+    </header>
+
+    <main id="gallery"></main>
+    <footer>
+      <p>© 2025 Hisaki & Sangyun</p>
+    </footer>
+  </div>
+
+  <div id="error-screen" class="hidden">
+    <h1>🚫 Access Denied</h1>
+    <p>Invalid access code.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

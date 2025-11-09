@@ -25,7 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSet = [];
   let currentIndex = 0;
 
-  // Day と Sort の組み合わせから現在表示セットを作成
+  // スワイプ / ドラッグ用変数
+  let pointerActive = false;
+  let startX = 0;
+  let lastX = 0;
+  const SWIPE_THRESHOLD = 50; // px, スワイプとして認定する閾値
+
   function buildCurrentSet(dayValue, sortValue) {
     const daysAll = ["Day1","Day2","Day3","Day4","Day5","Day6","Day7"];
     const dayList = dayValue === "All" ? daysAll : (dayValue ? [dayValue] : []);
@@ -33,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const result = [];
 
-    // All Day の場合、日別を順に追加。ただし各日ごとにその日の写真を sortOrder の順で追加
     if (dayValue === "All") {
       dayList.forEach(d => {
         sortOrder.forEach(n => {
@@ -46,12 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return result;
   }
 
-  // モーダル表示用のセットを更新して表示
   function showInModal(index) {
     if (!currentSet.length) return;
-    modalImg.src = currentSet[index];
+    currentIndex = Math.max(0, Math.min(index, currentSet.length - 1));
+    modalImg.src = currentSet[currentIndex];
     modal.classList.remove("hidden");
-    // キャンセル用フォーカスを当てる等の追加可
+    modal.setAttribute("aria-hidden", "false");
+    // 視覚的フィードインは CSS 側で制御しても良い
   }
 
   window.addEventListener("load", () => {
@@ -73,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     grantAccess();
   }
 
-  // 認証フォーム
   accessForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const inputCode = accessInput.value.trim();
@@ -85,14 +89,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 表示リストの初期化とイベント
+  function goPrev() {
+    if (!currentSet.length) return;
+    if (currentIndex > 0) {
+      currentIndex--;
+      modalImg.style.transform = "translateX(-20px)";
+      requestAnimationFrame(() => {
+        modalImg.src = currentSet[currentIndex];
+        modalImg.style.transform = "translateX(0)";
+      });
+    }
+  }
+  function goNext() {
+    if (!currentSet.length) return;
+    if (currentIndex < currentSet.length - 1) {
+      currentIndex++;
+      modalImg.style.transform = "translateX(20px)";
+      requestAnimationFrame(() => {
+        modalImg.src = currentSet[currentIndex];
+        modalImg.style.transform = "translateX(0)";
+      });
+    }
+  }
+
   function initializeGallery() {
     const dayVal = daySelect.value;
     const sortVal = sortSelect.value;
 
     currentSet = buildCurrentSet(dayVal, sortVal);
 
-    // 表示エリアを day ごとにセクション化して表示
     gallery.innerHTML = "";
     const sortNames = {
       "1": "Refrigerator",
@@ -112,14 +137,16 @@ document.addEventListener("DOMContentLoaded", () => {
         dayTitle.textContent = d;
         section.appendChild(dayTitle);
 
-        sortVal && currentSet.filter(u => u.includes(d)).forEach((src, idx) => {
-          const img = document.createElement("img");
-          img.src = src;
-          img.alt = `${d} - ${idx+1}`;
-          section.appendChild(img);
-        });
-        // ソート無しの場合は全写真を追加
-        if (!sortVal) {
+        // sortVal があれば currentSet を使ってその日の画像順を表示
+        if (sortVal) {
+          currentSet.filter(u => u.includes(d)).forEach((src, idx) => {
+            const img = document.createElement("img");
+            img.src = src;
+            img.alt = `${d} - ${idx+1}`;
+            section.appendChild(img);
+          });
+        } else {
+          // ソート無しはデフォルト 1..4
           for (let i = 1; i <= 4; i++) {
             const img = document.createElement("img");
             img.src = `picture/${d}/${i}.jpg`;
@@ -130,7 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         gallery.appendChild(section);
       });
     } else if (dayVal) {
-      // Day 単体
       currentSet.forEach((src, idx) => {
         const img = document.createElement("img");
         img.src = src;
@@ -140,22 +166,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // サムネイルクリックでモーダルを開く
-    gallery.querySelectorAll("img").forEach((img, idx) => {
+    const thumbs = gallery.querySelectorAll("img");
+    thumbs.forEach((img, idx) => {
       img.addEventListener("click", () => {
-        // currentSet に対応するクリック位置を特定
-        // dayVal が All の場合は day ごとに分割して表示されるため、インデックス計算は簡易化のため全体の構造を再構築する場合は別実装が望ましい
-        // 現実装では、All の場合は全画像をモーダルに列挙する前提でインデックスを img の順序と一致させる
-        const absoluteIndex = Array.from(gallery.querySelectorAll("img")).indexOf(img);
-        currentIndex = absoluteIndex;
-        showInModal(currentIndex);
+        // サムネイルの順で currentSet が一致していることを前提に絶対インデックスを使用
+        const absoluteIndex = Array.from(thumbs).indexOf(img);
+        // All のとき currentSet は dayごとの順で作られているため一致するはず
+        showInModal(absoluteIndex);
       });
     });
   }
 
-  // 日付・並び替え変更時の再描画
   daySelect.addEventListener("change", () => {
     initializeGallery();
-    // モーダルの現在位置はリセットし、新しいセットの先頭を表示するのが安全
     currentIndex = 0;
   });
 
@@ -164,50 +187,83 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = 0;
   });
 
-  // 初期表示の準備
+  // 初期表示
   initializeGallery();
 
-  // モーダル操作
   function closeModal() {
     modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
     modalImg.src = "";
   }
 
   modalClose.addEventListener("click", closeModal);
   modalBg.addEventListener("click", closeModal);
 
-  // 左右ナビゲーション
-  modalPrev.addEventListener("click", () => {
-    if (!currentSet.length) return;
-    if (currentIndex > 0) {
-      currentIndex--;
-      modalImg.src = currentSet[currentIndex];
-    }
-  });
+  // prev / next ボタン
+  if (modalPrev) modalPrev.addEventListener("click", goPrev);
+  if (modalNext) modalNext.addEventListener("click", goNext);
 
-  modalNext.addEventListener("click", () => {
-    if (!currentSet.length) return;
-    if (currentIndex < currentSet.length - 1) {
-      currentIndex++;
-      modalImg.src = currentSet[currentIndex];
-    }
-  });
-
-  // キーボード操作（左右矢印, Esc）
+  // キーボード操作
   document.addEventListener("keydown", (e) => {
     if (modal.classList.contains("hidden")) return;
     if (e.key === "ArrowLeft") {
-      if (currentIndex > 0) {
-        currentIndex--;
-        modalImg.src = currentSet[currentIndex];
-      }
+      goPrev();
     } else if (e.key === "ArrowRight") {
-      if (currentIndex < currentSet.length - 1) {
-        currentIndex++;
-        modalImg.src = currentSet[currentIndex];
-      }
+      goNext();
     } else if (e.key === "Escape") {
       closeModal();
     }
   });
+
+  /* ---------- Pointer events: スワイプ / ドラッグで前後切替 ---------- */
+  // pointerdown
+  modalImg.addEventListener("pointerdown", (e) => {
+    // モーダル内だけで扱う
+    pointerActive = true;
+    startX = e.clientX;
+    lastX = startX;
+    modalImg.setPointerCapture(e.pointerId);
+    modalImg.style.transition = ""; // 移動中はトランジションなし
+  });
+
+  // pointermove
+  modalImg.addEventListener("pointermove", (e) => {
+    if (!pointerActive) return;
+    const dx = e.clientX - startX;
+    lastX = e.clientX;
+    // 移動に合わせて画像を横にスライド（視覚フィードバック）
+    modalImg.style.transform = `translateX(${dx}px)`;
+  });
+
+  // pointerup / pointercancel
+  function onPointerEnd(e) {
+    if (!pointerActive) return;
+    pointerActive = false;
+    try { modalImg.releasePointerCapture(e.pointerId); } catch (err) {}
+    modalImg.style.transition = "transform 0.25s ease";
+    const totalDx = lastX - startX;
+    if (totalDx > SWIPE_THRESHOLD) {
+      // 右スワイプ -> 前の画像
+      goPrev();
+    } else if (totalDx < -SWIPE_THRESHOLD) {
+      // 左スワイプ -> 次の画像
+      goNext();
+    } else {
+      // 閾値に満たない -> 元に戻す
+      modalImg.style.transform = "translateX(0)";
+      // 少し遅らせてトランジションを戻す
+      setTimeout(() => {
+        modalImg.style.transform = "";
+      }, 260);
+    }
+  }
+
+  modalImg.addEventListener("pointerup", onPointerEnd);
+  modalImg.addEventListener("pointercancel", onPointerEnd);
+
+  // もしユーザがポインタを離したのが modal 外だった場合に備え、グローバルでもキャッチ
+  window.addEventListener("pointerup", (e) => {
+    if (!pointerActive) return onPointerEnd(e);
+  });
+
 });
