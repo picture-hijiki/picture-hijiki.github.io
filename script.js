@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalClose = document.getElementById("modal-close");
     const modalBg = document.getElementById("modal-bg");
   
-    // === ロードアニメーション ===
     window.addEventListener("load", () => {
       setTimeout(() => {
         loader.style.display = "none";
@@ -28,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 500);
     });
   
-    // === ギャラリー表示 ===
     function showGallery(day, order) {
       gallery.innerHTML = "";
   
@@ -52,23 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const section = document.createElement("section");
           section.className = "day-section";
   
-          // Day名タイトル
           const dayTitle = document.createElement("h3");
           dayTitle.textContent = d;
           section.appendChild(dayTitle);
   
-          // 左右スクロールボタン作成
-          const btnLeft = document.createElement("button");
-          btnLeft.className = "scroll-btn left";
-          btnLeft.textContent = "‹";  // 左矢印
-          const btnRight = document.createElement("button");
-          btnRight.className = "scroll-btn right";
-          btnRight.textContent = "›"; // 右矢印
-  
-          section.appendChild(btnLeft);
-          section.appendChild(btnRight);
-  
-          // 4枚（orderList）を横並びで追加
           orderList.forEach(num => {
             const img = document.createElement("img");
             img.src = `picture/${d}/${num}.jpg`;
@@ -76,22 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
             section.appendChild(img);
           });
   
-          // ボタンイベント：横スクロールを220pxずつ移動
-          btnLeft.addEventListener("click", () => {
-            section.scrollBy({ left: -220, behavior: "smooth" });
-          });
-          btnRight.addEventListener("click", () => {
-            section.scrollBy({ left: 220, behavior: "smooth" });
-          });
-  
-          // 横スクロール可能に設定
-          section.style.overflowX = "auto";
-          section.style.whiteSpace = "nowrap";
-  
           gallery.appendChild(section);
         });
       } else {
-        // 通常表示（単一day）
         orderList.forEach(num => {
           const img = document.createElement("img");
           img.src = `picture/${day}/${num}.jpg`;
@@ -109,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showGallery(daySelect.value, sortSelect.value);
     });
   
-    // === アクセス認証 ===
     function grantAccess() {
       authScreen.classList.add("hidden");
       viewer.classList.remove("hidden");
@@ -132,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   
-    // === 画像拡大・モーダル制御 ===
     gallery.addEventListener("click", (e) => {
       if (e.target.tagName === "IMG") {
         modalImg.src = e.target.src;
