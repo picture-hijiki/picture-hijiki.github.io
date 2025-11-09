@@ -7,34 +7,47 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- ロードアニメーション -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- 認証画面 -->
   <div id="auth-screen">
     <h1>🔒 Access Code Required</h1>
-    <input type="password" id="access-input" placeholder="Enter access code">
-    <button id="access-btn">Enter</button>
+    <form id="access-form">
+      <input type="password" id="access-input" placeholder="Enter access code" required>
+      <button type="submit" id="access-btn">Enter</button>
+    </form>
     <p id="error-message"></p>
   </div>
 
+  <!-- メインビューア -->
   <div id="viewer" class="hidden">
     <header>
       <h1>📸 Picture Viewer</h1>
-      <select id="day-select">
-        <option value="">Select Day</option>
-        <option value="Day1">Day 1</option>
-        <option value="Day2">Day 2</option>
-        <option value="Day3">Day 3</option>
-        <option value="Day4">Day 4</option>
-        <option value="Day5">Day 5</option>
-        <option value="Day6">Day 6</option>
-        <option value="Day7">Day 7</option>
-      </select>
+      <div class="controls">
+        <select id="day-select">
+          <option value="">Select Day</option>
+          <option value="All">All Days</option>
+          <option value="Day1">Day 1</option>
+          <option value="Day2">Day 2</option>
+          <option value="Day3">Day 3</option>
+          <option value="Day4">Day 4</option>
+          <option value="Day5">Day 5</option>
+          <option value="Day6">Day 6</option>
+          <option value="Day7">Day 7</option>
+        </select>
 
-      <select id="sort-select">
-        <option value="">Sort by</option>
-        <option value="1">Refrigerator</option>
-        <option value="2">Ziplock Bag</option>
-        <option value="3">Plastic Wrap</option>
-        <option value="4">Room Temperature</option>
-      </select>
+        <select id="sort-select">
+          <option value="">Sort by</option>
+          <option value="1">Refrigerator</option>
+          <option value="2">Ziplock Bag</option>
+          <option value="3">Plastic Wrap</option>
+          <option value="4">Room Temperature</option>
+        </select>
+      </div>
     </header>
 
     <main id="gallery"></main>
@@ -43,6 +56,7 @@
     </footer>
   </div>
 
+  <!-- エラー画面 -->
   <div id="error-screen" class="hidden">
     <h1>🚫 Access Denied</h1>
     <p>Invalid access code.</p>
