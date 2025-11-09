@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Picture Viewer</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <!-- ロードアニメーション -->
@@ -17,10 +17,17 @@
   <div id="auth-screen">
     <h1>🔒 Access Code Required</h1>
     <form id="access-form">
-      <input type="password" id="access-input" placeholder="Enter access code" required>
+      <input type="password" id="access-input" placeholder="Enter access code" required />
       <button type="submit" id="access-btn">Enter</button>
     </form>
     <p id="error-message"></p>
+  </div>
+
+  <!-- 画像拡大モーダル -->
+  <div id="modal" class="hidden">
+    <div id="modal-bg"></div>
+    <img id="modal-img" src="" alt="expanded view" />
+    <button id="modal-close">×</button>
   </div>
 
   <!-- メインビューア -->
@@ -48,6 +55,7 @@
           <option value="4">Room Temperature</option>
         </select>
       </div>
+      <h3 id="sort-display"></h3>
     </header>
 
     <main id="gallery"></main>
